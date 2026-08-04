@@ -15,6 +15,18 @@ const paymentOptions = [
   { value: 'upi', label: 'UPI' },
 ];
 
+const categoryButtons = [
+  'All',
+  'Electronics',
+  'Wearables',
+  'Accessories',
+  'Home',
+  'Gifts',
+  'Travel',
+  'Fashion',
+  'Deals',
+];
+
 function App() {
   const [page, setPage] = useState('home');
   const [products, setProducts] = useState([]);
@@ -40,10 +52,13 @@ function App() {
       });
   }, [apiUrl]);
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter((product) => {
+    if (!searchTerm || searchTerm.toLowerCase() === 'all') return true;
+    return (
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   const handleField = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
@@ -51,6 +66,11 @@ function App() {
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleCategoryClick = (category) => {
+    setSearchTerm(category === 'All' ? '' : category);
+    setPage('menu');
   };
 
   const handleAuth = async (mode) => {
@@ -167,62 +187,126 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header className="topbar">
-        <div className="logo-section">
-          <div className="brand">Shopease</div>
-          <div className="nav-links">
-            <button type="button" className="link-button" onClick={handlePage('home')}>Home</button>
-            <button type="button" className="link-button" onClick={handlePage('menu')}>Shop</button>
-            <button type="button" className="link-button" onClick={handlePage('login')}>Login</button>
-            <button type="button" className="link-button" onClick={handlePage('register')}>Register</button>
+      <header className="header-bar">
+        <div className="brand-block">
+          <div className="brand-logo">S</div>
+          <div>
+            <div className="brand-name">Shopease</div>
+            <div className="brand-subtitle">Shop with speed and style</div>
           </div>
         </div>
-        <div className="top-actions">
+
+        <div className="search-block">
+          <select className="category-select" value="all" disabled>
+            <option value="all">All</option>
+          </select>
           <input
-            className="search-box"
+            className="search-input"
             value={searchTerm}
             onChange={handleSearch}
-            placeholder="Search products, categories..."
+            placeholder="Search Shopease"
           />
-          <button type="button" className="cart-button" onClick={handlePage('cart')}>Cart ({cart.length})</button>
-          {user ? (
-            <div className="user-badge">
-              <span>Hi, {user.name || user.email}</span>
-              <button type="button" className="ghost-button small" onClick={logout}>Logout</button>
-            </div>
-          ) : null}
+          <button type="button" className="search-button">Search</button>
+        </div>
+
+        <div className="action-links">
+          <button type="button" className="nav-link" onClick={handlePage('login')}>{user ? `Hello, ${user.name || user.email}` : 'Sign in'}</button>
+          <button type="button" className="nav-link" onClick={handlePage('cart')}>Cart ({cart.length})</button>
         </div>
       </header>
+
+      <nav className="category-nav">
+        {categoryButtons.map((category) => (
+          <button key={category} type="button" className="category-nav-item" onClick={() => handleCategoryClick(category)}>
+            {category}
+          </button>
+        ))}
+      </nav>
 
       {message && <div className="toast">{message}</div>}
 
       {page === 'home' && (
-        <section className="hero-panel">
-          <div className="hero-copy">
-            <p className="eyebrow">Welcome to Shopease</p>
-            <h1>Stylish shopping made simple.</h1>
-            <p>Find trending products, checkout in a few clicks, and experience a demo ecommerce flow with login, cart, and payment options.</p>
-            <div className="hero-buttons">
-              <button type="button" className="primary-button" onClick={handlePage('menu')}>Explore products</button>
-              <button type="button" className="ghost-button" onClick={handlePage('cart')}>View cart</button>
+        <main>
+          <section className="hero-banner">
+            <div className="hero-copy">
+              <span className="hero-badge">Daily Deals</span>
+              <h1>Everything you need, delivered fast.</h1>
+              <p>Save big on trending tech, accessories, and lifestyle essentials.</p>
+              <div className="hero-actions">
+                <button type="button" className="primary-button" onClick={handlePage('menu')}>See today&apos;s deals</button>
+                <button type="button" className="ghost-button" onClick={handlePage('cart')}>Go to cart</button>
+              </div>
+              <div className="hero-notice">
+                Limited offer: Use the dummy payment flow to quickly place an order.
+              </div>
             </div>
-          </div>
-          <div className="hero-visual">
-            <div className="hero-card">
-              <h3>Fast checkout</h3>
-              <p>Add items, enter address, choose card or UPI, and confirm your order.</p>
+            <div className="hero-image-panel">
+              <div className="hero-image-card">
+                <img src={products[0]?.image || 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1200&q=80'} alt="Featured product" />
+                <div className="hero-image-text">
+                  <span>Best seller</span>
+                  <strong>Wireless Headphones</strong>
+                </div>
+              </div>
+              <div className="hero-image-card alt">
+                <img src={products[1]?.image || 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=80'} alt="Featured product" />
+                <div className="hero-image-text">
+                  <span>New arrival</span>
+                  <strong>Smart Watch</strong>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+
+          <section className="feature-strip">
+            <div className="feature-card">
+              <strong>Free delivery</strong>
+              <p>Fast dummy delivery on all orders.</p>
+            </div>
+            <div className="feature-card">
+              <strong>Secure checkout</strong>
+              <p>Dummy card and UPI payments supported.</p>
+            </div>
+            <div className="feature-card">
+              <strong>Deals every day</strong>
+              <p>Save more with our curated collections.</p>
+            </div>
+          </section>
+
+          <section className="products-section">
+            <div className="section-header">
+              <div>
+                <h2>Popular picks</h2>
+                <p>Trending products customers love this week.</p>
+              </div>
+              <button type="button" className="ghost-button small" onClick={handlePage('menu')}>Browse all</button>
+            </div>
+            <div className="product-grid-alt">
+              {filteredProducts.map((product) => (
+                <article key={product.id} className="product-card-alt">
+                  <div className="product-thumb" style={{ backgroundImage: `url(${product.image})` }} />
+                  <div className="product-info-card">
+                    <p className="product-category">{product.category}</p>
+                    <h3>{product.name}</h3>
+                    <p>{product.description}</p>
+                    <div className="product-footer">
+                      <span className="price">${product.price.toFixed(2)}</span>
+                      <button type="button" className="primary-button small" onClick={() => addToCart(product)}>Add to cart</button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        </main>
       )}
 
-      {(page === 'menu' || page === 'home') && (
-        <section className="catalog-section">
-          <div className="section-header">
-            <h2>Recommended products</h2>
-            <p>Browse curated items with realistic imagery and add what you want to your cart.</p>
-          </div>
-          {status === 'error' && <div className="error-banner">Unable to reach backend. Please check the backend server.</div>}
+      {page === 'menu' && (
+        <main className="products-page">
+          <section className="page-intro">
+            <h2>Shop the latest selections</h2>
+            <p>Browse all products and add your favorites to cart with one click.</p>
+          </section>
           <div className="product-grid-alt">
             {filteredProducts.map((product) => (
               <article key={product.id} className="product-card-alt">
@@ -232,19 +316,19 @@ function App() {
                   <h3>{product.name}</h3>
                   <p>{product.description}</p>
                   <div className="product-footer">
-                    <strong>${product.price.toFixed(2)}</strong>
+                    <span className="price">${product.price.toFixed(2)}</span>
                     <button type="button" className="primary-button small" onClick={() => addToCart(product)}>Add to cart</button>
                   </div>
                 </div>
               </article>
             ))}
           </div>
-        </section>
+        </main>
       )}
 
       {(page === 'login' || page === 'register') && (
         <section className="account-section">
-          <div className="account-card">
+          <div className="account-card auth-card">
             <div className="account-header">
               <button type="button" className={page === 'login' ? 'tab active' : 'tab'} onClick={handlePage('login')}>Login</button>
               <button type="button" className={page === 'register' ? 'tab active' : 'tab'} onClick={handlePage('register')}>Register</button>
@@ -280,14 +364,20 @@ function App() {
       {page === 'cart' && (
         <section className="basket-section">
           <div className="basket-card">
-            <h2>Your cart</h2>
+            <div className="basket-top">
+              <div>
+                <h2>Shopping cart</h2>
+                <p>{cart.length === 0 ? 'Your cart is empty.' : `${cart.length} item(s) ready for checkout.`}</p>
+              </div>
+              <button type="button" className="ghost-button small" onClick={handlePage('menu')}>Continue shopping</button>
+            </div>
             {cart.length === 0 ? (
-              <p>Your cart is empty. Add products from the shop to continue.</p>
+              <div className="empty-cart">Your cart is empty. Add products from the shop to continue.</div>
             ) : (
               <>
                 {cart.map((item) => (
                   <div key={item.id} className="cart-item">
-                    <div>
+                    <div className="cart-item-meta">
                       <h3>{item.name}</h3>
                       <p>{item.category}</p>
                       <strong>${(item.price * item.quantity).toFixed(2)}</strong>
@@ -345,3 +435,4 @@ function App() {
 }
 
 export default App;
+EOF
