@@ -1,0 +1,7 @@
+# Dependency manifest for the VM setup.
+# Install dependencies in the VM with:
+#   npm install --prefix backend
+#   npm install --prefix frontend
+#
+# Backend dependencies are declared in backend/package.json.
+# Frontend dependencies are declared in frontend/package.json.
