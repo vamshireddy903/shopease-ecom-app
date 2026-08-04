@@ -90,6 +90,24 @@ docker run -d --name shopease-frontend -p 3000:3000 --env-file .env shopease-fro
 docker ps
 ```
 
+## Access from VM Public IP
+
+If the VM has a public IP, open the following ports in the VM's security group and use the public IP to access the app:
+
+- Backend: `http://<VM_PUBLIC_IP>:5000`
+- Frontend: `http://<VM_PUBLIC_IP>:3000`
+
+If you are using the frontend in the browser, the frontend app will call the backend at `http://<VM_PUBLIC_IP>:5000/api`.
+
+## Security Group / Firewall Ports
+
+Allow inbound traffic to these ports in your security group:
+
+- `3000/tcp` for the frontend UI
+- `5000/tcp` for the backend API
+
+If you want external access only to the frontend, open `3000/tcp` and keep `5000/tcp` restricted to the VM or internal network only.
+
 ## View Logs
 
 ```bash
