@@ -4,14 +4,13 @@ function getEnv(name, fallback = '') {
   return process.env[name] || fallback;
 }
 
-function createPool(prefix) {
-  const host = getEnv(`${prefix}_HOST`) || getEnv('DB_HOST');
-  const port = Number(getEnv(`${prefix}_PORT`) || getEnv('DB_PORT') || '3306');
-  const user = getEnv(`${prefix}_USER`) || getEnv('DB_USER');
-  const password = getEnv(`${prefix}_PASSWORD`) || getEnv('DB_PASSWORD');
-  const database = getEnv(`${prefix}_NAME`) || getEnv('DB_NAME');
+function createPool(databaseName) {
+  const host = getEnv('DB_HOST');
+  const port = Number(getEnv('DB_PORT') || '3306');
+  const user = getEnv('DB_USER');
+  const password = getEnv('DB_PASSWORD');
 
-  if (!host || !user || !password || !database) {
+  if (!host || !user || !password || !databaseName) {
     return null;
   }
 
@@ -20,15 +19,15 @@ function createPool(prefix) {
     port,
     user,
     password,
-    database,
+    database: databaseName,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
   });
 }
 
-const authPool = createPool('AUTH_DB');
-const orderPool = createPool('ORDER_DB');
+const authPool = createPool(getEnv('AUTH_DB_NAME') || getEnv('DB_NAME') || 'authdb');
+const orderPool = createPool(getEnv('ORDER_DB_NAME') || 'ordersdb');
 
 const memoryStore = {
   users: [],
