@@ -10,15 +10,16 @@ const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
+const clientOrigin = process.env.CLIENT_ORIGIN;
 const allowedOrigins = [
-  process.env.CLIENT_ORIGIN,
+  clientOrigin,
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || clientOrigin === '*') {
       callback(null, true);
       return;
     }

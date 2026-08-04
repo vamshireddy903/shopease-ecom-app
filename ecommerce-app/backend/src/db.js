@@ -83,6 +83,9 @@ async function initializeStores() {
         user_id INT NOT NULL,
         items JSON NOT NULL,
         total_amount DECIMAL(10,2) NOT NULL,
+        address TEXT NOT NULL,
+        payment_method VARCHAR(50) NOT NULL,
+        payment_details JSON NOT NULL,
         status VARCHAR(50) NOT NULL DEFAULT 'placed',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
