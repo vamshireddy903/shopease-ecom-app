@@ -4,12 +4,14 @@ function getEnv(name, fallback = '') {
   return process.env[name] || fallback;
 }
 
-function createPool(databaseName) {
-  const host = getEnv('DB_HOST');
-  const port = Number(getEnv('DB_PORT') || '3306');
-  const user = getEnv('DB_USER');
-  const password = getEnv('DB_PASSWORD');
+const host = getEnv('DB_HOST');
+const port = Number(getEnv('DB_PORT') || '3306');
+const user = getEnv('DB_USER');
+const password = getEnv('DB_PASSWORD');
+const authDbName = getEnv('AUTH_DB_NAME') || getEnv('DB_NAME') || 'authdb';
+const orderDbName = getEnv('ORDER_DB_NAME') || 'ordersdb';
 
+function createPool(databaseName) {
   if (!host || !user || !password || !databaseName) {
     return null;
   }
@@ -26,15 +28,42 @@ function createPool(databaseName) {
   });
 }
 
-const authPool = createPool(getEnv('AUTH_DB_NAME') || getEnv('DB_NAME') || 'authdb');
-const orderPool = createPool(getEnv('ORDER_DB_NAME') || 'ordersdb');
+const basePool = host && user && password ? mysql.createPool({
+  host,
+  port,
+  user,
+  password,
+  waitForConnections: true,
+  connectionLimit: 5,
+  queueLimit: 0,
+}) : null;
+
+let authPool = null;
+let orderPool = null;
 
 const memoryStore = {
   users: [],
   orders: [],
 };
 
+async function ensureDatabase(databaseName) {
+  if (!basePool) {
+    throw new Error('Base DB connection is not configured');
+  }
+  await basePool.query(`CREATE DATABASE IF NOT EXISTS \`${databaseName}\``);
+}
+
 async function initializeStores() {
+  if (!basePool) {
+    throw new Error('Database environment is not configured');
+  }
+
+  await ensureDatabase(authDbName);
+  await ensureDatabase(orderDbName);
+
+  authPool = createPool(authDbName);
+  orderPool = createPool(orderDbName);
+
   if (authPool) {
     await authPool.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -61,9 +90,17 @@ async function initializeStores() {
   }
 }
 
+function getAuthPool() {
+  return authPool;
+}
+
+function getOrderPool() {
+  return orderPool;
+}
+
 module.exports = {
-  authPool,
-  orderPool,
+  getAuthPool,
+  getOrderPool,
   memoryStore,
   initializeStores,
 };
