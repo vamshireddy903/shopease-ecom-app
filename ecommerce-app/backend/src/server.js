@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+const { initializeStores } = require('./db');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
@@ -47,7 +48,17 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong' });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await initializeStores();
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Backend server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to initialize backend stores:', err);
+    process.exit(1);
+  }
+}
+
+startServer();

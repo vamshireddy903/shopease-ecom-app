@@ -39,9 +39,21 @@ DB_PORT=3306
 DB_USER=your_db_user
 DB_PASSWORD=your_db_password
 DB_NAME=your_db_name
+AUTH_DB_HOST=your_auth_db_host
+AUTH_DB_PORT=3306
+AUTH_DB_USER=your_auth_db_user
+AUTH_DB_PASSWORD=your_auth_db_password
+AUTH_DB_NAME=your_auth_db_name
+ORDER_DB_HOST=your_orders_db_host
+ORDER_DB_PORT=3306
+ORDER_DB_USER=your_orders_db_user
+ORDER_DB_PASSWORD=your_orders_db_password
+ORDER_DB_NAME=your_orders_db_name
 CLIENT_ORIGIN=http://localhost:3000
 PORT=5000
 ```
+
+Use separate databases for users/authentication and orders if you want them stored independently.
 
 ### Frontend
 File: `ecommerce-app/frontend/.env`
