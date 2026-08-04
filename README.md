@@ -9,17 +9,21 @@ This repository contains a simple e-commerce frontend and backend, ready to be c
 
 ## Prerequisites
 
-Install Docker on the VM:
+On the VM, you only need Docker and Git.
+
+Install Docker:
 
 ```bash
 sudo apt update
-sudo apt install -y docker.io docker-compose-plugin
+sudo apt install -y docker.io docker-compose-plugin git
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker $USER
 ```
 
 Log out and log back in after the `usermod` step.
+
+No additional Node.js or package installation is required on the VM because the app is containerized.
 
 ## Environment Files
 
